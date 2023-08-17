@@ -215,8 +215,8 @@ const getItemsByLocation = async (req, res, next)=>{
                 listItems.push({
                   prop_image: sell.image,
                   prop_name: sell.name,
-                  prop_details: `${sell.id}|₹${sell.cost}|${sell.bhk}BHK`,
-                  prop_mode: 'house',
+                  prop_details: `${sell.list_item_id}|₹${sell.cost}|${sell.bhk}BHK`,
+                  prop_mode: 'sell',
                   prop_location: sell.location
                 });
               });
@@ -225,8 +225,8 @@ const getItemsByLocation = async (req, res, next)=>{
                 listItems.push({
                   prop_image: rent.image,
                   prop_name: rent.name,
-                  prop_details: `${rent.id}|₹${rent.cost}|${rent.bhk}BHK`,
-                  prop_mode: 'house',
+                  prop_details: `${rent.list_item_id}|₹${rent.cost}|${rent.bhk}BHK`,
+                  prop_mode: 'rent',
                   prop_location: rent.location
                 });
               });
@@ -238,8 +238,7 @@ const getItemsByLocation = async (req, res, next)=>{
       });
     }
   });
-
-
+    
 };
 
 

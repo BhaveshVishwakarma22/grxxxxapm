@@ -165,6 +165,86 @@ const updateHouseSell = async (req, res, next)=>{
 };
 
 
+
+//@desc GET All list items based on location
+//@route GET /house_sell/item/:location
+//@access public
+const getItemsByLocation = async (req, res, next)=>{
+  const location = req.params.location;
+
+  const fetchPlotQuery = `
+    SELECT * FROM plot_list WHERE location = ?;
+  `;
+
+  const fetchSellQuery = `
+    SELECT * FROM house_sell_list WHERE location = ?;
+  `;
+
+  const fetchRentQuery = `
+    SELECT * FROM house_rent_list WHERE location = ?;
+  `;
+
+  connection.query(fetchPlotQuery, [location], (errPlot, plotData) => {
+    if (errPlot) {
+      console.error('Error fetching plot data:', errPlot);
+      res.status(500).json({ error: 'Error fetching plot data' });
+    } else {
+      connection.query(fetchSellQuery, [location], (errSell, sellData) => {
+        if (errSell) {
+          console.error('Error fetching sell data:', errSell);
+          res.status(500).json({ error: 'Error fetching sell data' });
+        } else {
+          connection.query(fetchRentQuery, [location], (errRent, rentData) => {
+            if (errRent) {
+              console.error('Error fetching rent data:', errRent);
+              res.status(500).json({ error: 'Error fetching rent data' });
+            } else {
+              const listItems = [];
+
+              plotData.forEach((plot) => {
+                listItems.push({
+                  prop_image: plot.image,
+                  prop_name: plot.name,
+                  prop_details: `${plot.id}|₹${plot.cost}|${plot.area}`,
+                  prop_mode: 'plot',
+                  prop_location: plot.location
+                });
+              });
+
+              sellData.forEach((sell) => {
+                listItems.push({
+                  prop_image: sell.image,
+                  prop_name: sell.name,
+                  prop_details: `${sell.id}|₹${sell.cost}|${sell.bhk}BHK`,
+                  prop_mode: 'house',
+                  prop_location: sell.location
+                });
+              });
+
+              rentData.forEach((rent) => {
+                listItems.push({
+                  prop_image: rent.image,
+                  prop_name: rent.name,
+                  prop_details: `${rent.id}|₹${rent.cost}|${rent.bhk}BHK`,
+                  prop_mode: 'house',
+                  prop_location: rent.location
+                });
+              });
+
+              res.status(200).json(listItems);
+            }
+          });
+        }
+      });
+    }
+  });
+
+
+};
+
+
+
+
 //@desc delete HouseSell
 //@route DELETE /house_sell/
 //@access public
@@ -200,4 +280,4 @@ const deleteHouseSell = async(req, res, next)=>{
 
 
 
-module.exports = {getAllHouseSell, getUserHouseSell, addHouseSell, updateHouseSell, deleteHouseSell};
+module.exports = {getAllHouseSell, getUserHouseSell, addHouseSell, updateHouseSell, deleteHouseSell, getItemsByLocation};
